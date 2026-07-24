@@ -1,6 +1,6 @@
 {% import 'macro_functions.html.twig' as mf %}
 
-{% set service = admin.order_service({ "id": order.id }) %}
+{% set service = admin.order_service({ "id": order.id })|default({}) %}
 <div class="card mb-4">
     <div class="card-body overflow-auto">
         <h3>{{ 'DNS Record Management'|trans }}</h3>
@@ -51,7 +51,7 @@
                     </tr>
                 </thead>
                     <tbody id="recordsTableBody">
-                        {% for record in service.records %}
+                        {% for record in service.records|default([]) %}
                         <form class="mb-4 api-form" action="{{ 'servicedns/update'|api_url(role='client') }}" {{ fb_api_form({ message: 'Record updated'|trans }) }}>
                         <input type="hidden" name="record_id" value="{{ record.id }}"/>
                         <input type="hidden" name="record_type" value="{{ record.type }}"/>
@@ -69,7 +69,7 @@
                                 {% elseif dns_type == 'SPF' %}bg-red-lt
                                 {% elseif dns_type == 'DS' %}bg-purple-lt
                                 {% else %}bg-default
-                                {% endif %}">{{ dns_type }}</span></td></td>
+                                {% endif %}">{{ dns_type }}</span></td>
                                 <td><strong>{{ record.host }}</strong></td>
                                 <td><input type="text" class="form-control" placeholder="127.0.0.1" name="record_value" value="{{ record.value }}" style="min-width:200px;" required></td>
                                 <td><input type="text" class="form-control" placeholder="600" name="record_ttl" value="{{ record.ttl }}" style="min-width:100px;" required></td>
@@ -103,7 +103,7 @@ function confirmDelete(form) {
     event.preventDefault();
 
     if (confirm("Are you sure you want to delete this record?")) {
-        fetch("{{ 'api/client/servicedns/del'|url }}", {
+        fetch("{{ 'servicedns/del'|api_url(role='client') }}", {
             method: 'POST',
             body: new FormData(form),
             headers: {
