@@ -1,4 +1,4 @@
-{% block subject %}[{{ guest.system_company.name }}] {{ order.title }} Canceled{% endblock %}
+{% block subject %}[{{ guest.system_company.name|default('') }}] {{ order.title }} Canceled{% endblock %}
 {% block content %}
 <!DOCTYPE html>
 <html>
@@ -37,16 +37,16 @@
 <body>
 	<h1>Order canceled</h1>
 	<p>Hello {{ c.first_name }} {{ c.last_name }},</p>
-	<p>Your <strong>{{ order.title }}</strong> that was activated on <strong>{{ order.activated_at|format_date }}</strong> is now canceled.</p>
-    {% if order.reason %}
-        <p><strong>Reason:</strong> {{ order.reason }}</p>
+	<p>Your <strong>{{ order.title }}</strong> that was activated on <strong>{% if order.activated_at is defined %}{{ order.activated_at|format_date }}{% endif %}</strong> is now canceled.</p>
+    {% if order.reason|default is not empty %}
+        <p><strong>Reason:</strong> {{ order.reason|default('') }}</p>
     {% endif %}
 
     <p>If you have any questions regarding this, please login to the members area and submit a support ticket.</p>
 
     <p>You may <a href="{{'login'|url({'email' : c.email }) }}" target="_blank">login</a> or <a href="{{ 'support'|url({'ticket' : 1}) }}" target="_blank">submit a ticket.</a>
 
-	<p class="signature">{{ guest.system_company.signature }}</p>
+	<p class="signature">{{ guest.system_company.signature|default('') }}</p>
 </body>
 </html>
 {% endblock %}

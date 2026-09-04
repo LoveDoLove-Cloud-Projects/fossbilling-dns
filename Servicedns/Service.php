@@ -44,7 +44,13 @@ class Service implements InjectionAwareInterface
 
     public function attachOrderConfig(\Model_Product $product, array $data): array
     {
-        !empty($product->config) ? $config = json_decode($product->config, true) : $config = [];
+        $config = [];
+        if (!empty($product->config)) {
+            $decoded = json_decode($product->config, true);
+            if (is_array($decoded)) {
+                $config = $decoded;
+            }
+        }
 
         return array_merge($config, $data);
     }
@@ -230,6 +236,7 @@ class Service implements InjectionAwareInterface
     {
         $domain_id = $this->di['db']->findOne('service_dns', 'domain_name = :domain_name', [':domain_name' => $model->domain_name]);
         $records = $this->di['db']->getAll('SELECT id, type, host, value, ttl, priority FROM service_dns_records WHERE domain_id=:domain_id', ['domain_id' => $domain_id['id']]);
+        $decodedConfig = json_decode((string) $model->config, true);
 
         return [
             'id' => $model->id,
@@ -237,7 +244,7 @@ class Service implements InjectionAwareInterface
             'updated_at' => $model->updated_at,
             'domain_name' => $model->domain_name,
             'records' => $records,
-            'config' => json_decode($model->config, true),
+            'config' => is_array($decodedConfig) ? $decodedConfig : [],
         ];
     }
 

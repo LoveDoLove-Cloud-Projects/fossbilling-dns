@@ -1,3 +1,4 @@
+{% set config = product.config|default({}) %}
 {{ product_details }}
 
 <div class="mb-3">
@@ -24,8 +25,8 @@
     <ul>
       {% for i in 1..5 %}
         {% set key = 'ns' ~ i %}
-        {% if product.config[key] is defined and product.config[key] %}
-          <li>{{ product.config[key] }}</li>
+        {% if config[key] is defined and config[key] %}
+          <li>{{ config[key] }}</li>
         {% endif %}
       {% endfor %}
     </ul>
